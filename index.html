@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Chat Room</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+            }
+            50% {
+                box-shadow: 0 0 20px 8px rgba(34, 197, 94, 0.4);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .speaking {
+            animation: pulseGlow 1.5s ease-in-out infinite;
+        }
+
+        .seat-hover {
+            transition: all 0.3s ease;
+        }
+
+        .seat-hover:hover {
+            transform: scale(1.05);
+        }
+
+        .btn-hover {
+            transition: all 0.2s ease;
+        }
+
+        .btn-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-hover:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="bg-black text-white min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-purple-900/30 to-black border-b border-purple-500/20 px-4 py-4 fade-in">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-lg flex items-center justify-center">
+                    <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">
+                        Voice Chat Room
+                    </h1>
+                    <p class="text-xs text-gray-400">Welcome to the lounge</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2 bg-purple-900/30 px-4 py-2 rounded-full border border-purple-500/30">
+                <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <span class="text-sm font-medium">
+                    <span id="onlineCount">1</span> online
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content - Seat Grid -->
+    <main class="flex-1 px-4 py-8 fade-in">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 md:gap-6">
+                <!-- Seats will be dynamically generated -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer Controls -->
+    <footer class="bg-gradient-to-r from-black to-purple-900/30 border-t border-purple-500/20 px-4 py-4 fade-in">
+        <div class="max-w-7xl mx-auto flex items-center justify-center space-x-4">
+            <button id="takeMicBtn" class="btn-hover bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-400 hover:to-yellow-500 text-black font-semibold px-6 py-3 rounded-lg shadow-lg">
+                <span class="flex items-center space-x-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+                    </svg>
+                    <span>Take Mic</span>
+                </span>
+            </button>
+            <button id="leaveSeatBtn" class="btn-hover bg-gray-800 hover:bg-gray-700 text-white font-semibold px-6 py-3 rounded-lg border border-gray-600 shadow-lg">
+                <span class="flex items-center space-x-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                    <span>Leave Seat</span>
+                </span>
+            </button>
+            <button id="giftBtn" class="btn-hover bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 text-white font-semibold px-6 py-3 rounded-lg shadow-lg">
+                <span class="flex items-center space-x-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path>
+                    </svg>
+                    <span>Gift</span>
+                </span>
+            </button>
+        </div>
+    </footer>
+
+    <script>
+        // State management
+        const state = {
+            seats: Array(12).fill(null), // 12 seats, null = empty
+            currentUserSeat: null, // Index of seat occupied by current user
+            speakingSeats: new Set(), // Set of seat indices that are speaking
+            onlineCount: 1, // Starting with current user
+            username: 'You' // Current user's name
+        };
+
+        // Initialize the app
+        function init() {
+            renderSeats();
+            updateOnlineCount();
+            setupEventListeners();
+        }
+
+        // Render all seats
+        function renderSeats() {
+            const container = document.querySelector('main .grid');
+            container.innerHTML = '';
+
+            state.seats.forEach((seat, index) => {
+                const seatElement = createSeatElement(index, seat);
+                container.appendChild(seatElement);
+            });
+        }
+
+        // Create a seat element
+        function createSeatElement(index, seatData) {
+            const seatDiv = document.createElement('div');
+            seatDiv.className = 'seat-hover flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all cursor-pointer';
+            
+            const isOccupied = seatData !== null;
+            const isCurrentUser = state.currentUserSeat === index;
+            const isSpeaking = state.speakingSeats.has(index);
+
+            if (isOccupied) {
+                // Occupied seat
+                seatDiv.className += ` bg-gradient-to-br from-purple-900/40 to-black border-purple-500/50 ${isSpeaking ? 'speaking' : ''}`;
+                
+                const avatar = document.createElement('div');
+                avatar.className = `w-16 h-16 md:w-20 md:h-20 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center text-black font-bold text-lg md:text-xl mb-2 border-2 ${isSpeaking ? 'border-green-400' : 'border-purple-400'}`;
+                avatar.textContent = seatData.username.charAt(0).toUpperCase();
+                seatDiv.appendChild(avatar);
+
+                const username = document.createElement('div');
+                username.className = 'text-sm md:text-base font-medium text-gray-200 mb-1';
+                username.textContent = seatData.username;
+                seatDiv.appendChild(username);
+
+                const micIcon = document.createElement('div');
+                micIcon.className = 'flex items-center space-x-1 text-xs text-gray-400';
+                micIcon.innerHTML = `
+                    <svg class="w-4 h-4 ${isSpeaking ? 'text-green-400' : 'text-gray-500'}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+                    </svg>
+                    <span>${isSpeaking ? 'Speaking' : 'Muted'}</span>
+                `;
+                seatDiv.appendChild(micIcon);
+
+                // Click handler for occupied seat
+                seatDiv.addEventListener('click', () => {
+                    if (isCurrentUser) {
+                        leaveSeat(index);
+                    }
+                });
+            } else {
+                // Empty seat
+                seatDiv.className += ' bg-black/50 border-dashed border-gray-600 hover:border-purple-500/50';
+                
+                const emptyIcon = document.createElement('div');
+                emptyIcon.className = 'w-16 h-16 md:w-20 md:h-20 rounded-full border-2 border-dashed border-gray-600 flex items-center justify-center mb-2';
+                emptyIcon.innerHTML = `
+                    <svg class="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                `;
+                seatDiv.appendChild(emptyIcon);
+
+                const emptyText = document.createElement('div');
+                emptyText.className = 'text-xs md:text-sm text-gray-500 font-medium';
+                emptyText.textContent = 'Empty Seat';
+                seatDiv.appendChild(emptyText);
+
+                // Click handler for empty seat
+                seatDiv.addEventListener('click', () => {
+                    occupySeat(index);
+                });
+            }
+
+            return seatDiv;
+        }
+
+        // Occupy a seat
+        function occupySeat(index) {
+            if (state.currentUserSeat !== null) {
+                // Leave current seat first
+                state.seats[state.currentUserSeat] = null;
+            }
+
+            state.seats[index] = {
+                username: state.username,
+                userId: 'current-user'
+            };
+            state.currentUserSeat = index;
+            
+            updateButtonStates();
+            renderSeats();
+        }
+
+        // Leave a seat
+        function leaveSeat(index) {
+            if (state.seats[index] && state.seats[index].userId === 'current-user') {
+                state.seats[index] = null;
+                state.currentUserSeat = null;
+                state.speakingSeats.delete(index);
+                
+                updateButtonStates();
+                renderSeats();
+            }
+        }
+
+        // Toggle speaking state
+        function toggleSpeaking() {
+            if (state.currentUserSeat !== null) {
+                if (state.speakingSeats.has(state.currentUserSeat)) {
+                    state.speakingSeats.delete(state.currentUserSeat);
+                } else {
+                    state.speakingSeats.add(state.currentUserSeat);
+                }
+                renderSeats();
+            }
+        }
+
+        // Update online count (simulated)
+        function updateOnlineCount() {
+            const occupiedSeats = state.seats.filter(seat => seat !== null).length;
+            state.onlineCount = Math.max(1, occupiedSeats);
+            document.getElementById('onlineCount').textContent = state.onlineCount;
+        }
+
+        // Update button states
+        function updateButtonStates() {
+            const hasSeat = state.currentUserSeat !== null;
+            document.getElementById('takeMicBtn').disabled = !hasSeat;
+            document.getElementById('leaveSeatBtn').disabled = !hasSeat;
+            
+            if (hasSeat) {
+                document.getElementById('takeMicBtn').classList.remove('opacity-50', 'cursor-not-allowed');
+                document.getElementById('leaveSeatBtn').classList.remove('opacity-50', 'cursor-not-allowed');
+            } else {
+                document.getElementById('takeMicBtn').classList.add('opacity-50', 'cursor-not-allowed');
+                document.getElementById('leaveSeatBtn').classList.add('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Take Mic button
+            document.getElementById('takeMicBtn').addEventListener('click', () => {
+                if (state.currentUserSeat !== null) {
+                    toggleSpeaking();
+                }
+            });
+
+            // Leave Seat button
+            document.getElementById('leaveSeatBtn').addEventListener('click', () => {
+                if (state.currentUserSeat !== null) {
+                    leaveSeat(state.currentUserSeat);
+                }
+            });
+
+            // Gift button (UI only)
+            document.getElementById('giftBtn').addEventListener('click', () => {
+                // Visual feedback only
+                const btn = document.getElementById('giftBtn');
+                btn.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    btn.style.transform = '';
+                }, 150);
+            });
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
