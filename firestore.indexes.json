@@ -1,0 +1,21 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "withdrawalRequests",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "requestedAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "hostActivity",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "weekKey", "order": "ASCENDING" },
+        { "fieldPath": "minutes", "order": "DESCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}
